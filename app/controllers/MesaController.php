@@ -1,39 +1,67 @@
 <?php
 
     require_once 'models/mesa.php';
+    require_once './interfaces/IApiUsable.php';
 
-    class MesaController 
+    class MesaController extends Mesa implements IApiUsable
     {
 
-        public function insertarMesa($codigoMesa, $estado) 
+        public function insertar($request, $response, $args) 
         {
-            $mesa = new Mesa(); //instancia el mesa
+            $parametros = $request->getParsedBody();
 
-            //asigna los campos
-            $mesa->codigoMesa = $codigoMesa; 
-            $mesa->estado = $estado;
+            $codigoMesa = $parametros['codigoMesa'];
+            $estado = $parametros['estado'];
 
-            return $mesa->crearMesa();
-        }
-
-        public function modificarMesa($codigoMesa, $estado) 
-        {
             $mesa = new Mesa();
             $mesa->codigoMesa = $codigoMesa; 
             $mesa->estado = $estado;
-            //return $mesa->modificarMesa();
+            $mesa->crearMesa();
+
+            $payload = json_encode(array("mensaje" => "Mesa creada con exito"));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
         }
 
-        public function borrarMesa($id) 
+        public function modificar($request, $response, $args) 
         {
+            $parametros = $request->getParsedBody();
+
+            $codigoMesa = $parametros['codigoMesa'];
+            $estado = $parametros['estado'];
+
             $mesa = new Mesa();
-            $mesa->id = $id;
-            return $mesa->borrarMesa($id);
+            $mesa->codigoMesa = $codigoMesa; 
+            $mesa->estado = $estado;
+            $mesa->modificarMesa();
+
+            $payload = json_encode(array("mensaje" => "Mesa creada con exito"));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
         }
 
-        public function listarMesas() 
+        public function borrar($request, $response, $args) 
         {
-            return Mesa::obtenerTodos();
+            $parametros = $request->getParsedBody();
+
+            $pedidoId = $parametros['id'];
+            Mesa::borrarMesa($pedidoId);
+
+            $payload = json_encode(array("mensaje" => "Mesa borrado con exito"));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+
+        public function listarTodos($request, $response, $args) 
+        {
+            $lista = Mesa::obtenerTodos();
+            $payload = json_encode(array("listaProductos" => $lista));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
         }
 
     }

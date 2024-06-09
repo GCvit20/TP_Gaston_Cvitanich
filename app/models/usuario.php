@@ -13,7 +13,7 @@ class Usuario
     {
         
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO usuarios (nombreEmpleado, ocupacion) VALUES (:nombreEmpleado, :ocupacion)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO usuario (nombreEmpleado, ocupacion) VALUES (:nombreEmpleado, :ocupacion)");
         //$claveHash = password_hash($this->clave, PASSWORD_DEFAULT);
         $consulta->bindValue(':nombreEmpleado', $this->nombreEmpleado, PDO::PARAM_STR);
         $consulta->bindValue(':ocupacion', $this->ocupacion, PDO::PARAM_STR);
@@ -41,15 +41,15 @@ class Usuario
         return $consulta->fetchObject('Usuario');
     }
 
-    public static function modificarUsuario()
+    public function modificarUsuario()
     {
-        /*
+        
         $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuarios SET usuario = :usuario, clave = :clave WHERE id = :id");
-        $consulta->bindValue(':usuario', $this->usuario, PDO::PARAM_STR);
-        $consulta->bindValue(':clave', $this->clave, PDO::PARAM_STR);
+        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuario SET usuario = :usuario, clave = :clave WHERE id = :id");
+        $consulta->bindValue(':usuario', $this->nombreEmpleado, PDO::PARAM_STR);
+        $consulta->bindValue(':ocupacion', $this->ocupacion, PDO::PARAM_STR);
         $consulta->bindValue(':id', $this->id, PDO::PARAM_INT);
-        $consulta->execute();*/
+        $consulta->execute();
     }
 
     public static function borrarUsuario($usuario)

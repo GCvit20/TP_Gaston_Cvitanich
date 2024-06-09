@@ -1,48 +1,86 @@
 <?php
 
     require_once 'models/pedido.php';
+    require_once './interfaces/IApiUsable.php';
     //Recibe los datos, instancia el modelo y se encarga de llamar a los metodos del modelo.
 
-    class PedidoController 
+    class PedidoController extends Pedido implements IApiUsable
     {
 
-        public function insertarPedido($codigoPedido, $estado, $tiempo, $precioFinal, $foto, $nombreCliente) 
+        public function insertar($request, $response, $args) 
         {
+            
+            $parametros = $request->getParsedBody();
+
+            $idMesa = $parametros['idMesa'];
+            $codigoPedido = $parametros['codigoPedido'];
+            $estado = $parametros['estado'];
+            $precioFinal = $parametros['precioFinal'];
+            $foto = $parametros['foto'];
+            $nombreCliente = $parametros['nombreCliente'];
+
             $pedido = new Pedido(); //instancia el pedido
-
-            //asigna los campos
+            $pedido->idMesa = $idMesa; 
             $pedido->codigoPedido = $codigoPedido; 
             $pedido->estado = $estado;
-            $pedido->tiempo = $tiempo;
             $pedido->precioFinal = $precioFinal;
             $pedido->foto = $foto;
             $pedido->nombreCliente = $nombreCliente;
+            $pedido->crearPedido();
 
-            return $pedido->crearPedido();
+            $payload = json_encode(array("mensaje" => "Pedido creado con exito"));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
         }
 
-        public function modificarPedido($codigoPedido, $estado, $tiempo, $precioFinal, $foto, $nombreCliente) 
+        public function modificar($request, $response, $args) 
         {
+            
+            $parametros = $request->getParsedBody();
+
+            $idMesa = $parametros['idMesa'];
+            $codigoPedido = $parametros['codigoPedido'];
+            $estado = $parametros['estado'];
+            $precioFinal = $parametros['precioFinal'];
+            $foto = $parametros['foto'];
+            $nombreCliente = $parametros['nombreCliente'];
+
             $pedido = new Pedido();
+            $pedido->idMesa = $idMesa; 
             $pedido->codigoPedido = $codigoPedido; 
             $pedido->estado = $estado;
-            $pedido->tiempo = $tiempo;
             $pedido->precioFinal = $precioFinal;
             $pedido->foto = $foto;
             $pedido->nombreCliente = $nombreCliente;
-            //return $pedido->modificarProducto();
+            $pedido->modificarPedido();
+
+            $payload = json_encode(array("mensaje" => "Pedido modificado con exito"));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
         }
 
-        public function borrarPedido($id) 
+        public function borrar($request, $response, $args) 
         {
-            $pedido = new Pedido();
-            $pedido->id = $id;
-            return $pedido->borrarPedido($id);
+            $parametros = $request->getParsedBody();
+
+            $pedidoId = $parametros['id'];
+            Pedido::borrarPedido($pedidoId);
+
+            $payload = json_encode(array("mensaje" => "Pedido borrado con exito"));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
         }
 
-        public function listarPedidos() 
+        public function listarTodos($request, $response, $args) 
         {
-            return Pedido::obtenerTodos();
+            $lista = Pedido::obtenerTodos();
+            $payload = json_encode(array("listaPedido" => $lista));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
         }
 
     }

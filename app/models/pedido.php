@@ -5,9 +5,9 @@
     class Pedido
     {
         public $id;
+        public $idMesa;
         public $codigoPedido; //alfanumerico 5 caracteres
         public $estado;
-        public $tiempo;
         public $precioFinal;
         public $foto;
         public $nombreCliente;
@@ -15,12 +15,12 @@
         public function crearPedido()
         {
             $objAccesoDatos = AccesoDatos::obtenerInstancia();
-            $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO mesa (codigoPedido, estado, tiempo, precioFinal, foto, nombreCliente) VALUES (:codigoPedido, :estado, :tiempo, :precioFinal, :foto, :nombreCliente)");
+            $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedido (idMesa, codigoPedido, estado, precioFinal, foto, nombreCliente) VALUES (:idMesa, :codigoPedido, :estado, :tiempo, :precioFinal, :foto, :nombreCliente)");
+            $consulta->bindValue(':idMesa', $this->idMesa, PDO::PARAM_INT);
             $consulta->bindValue(':codigoPedido', $this->codigoPedido, PDO::PARAM_INT);
             $consulta->bindValue(':estado', $this->estado, PDO::PARAM_STR);
-            $consulta->bindValue(':tiempo', $this->tiempo, PDO::PARAM_STR);
             $consulta->bindValue(':precioFinal', $this->precioFinal, PDO::PARAM_INT);
-            $consulta->bindValue(':foto', $this->foto, PDO::PARAM_STR); //chequear
+            $consulta->bindValue(':foto', $this->foto, PDO::PARAM_LOB);
             $consulta->bindValue(':nombreCliente', $this->nombreCliente, PDO::PARAM_STR);
             $consulta->execute();
 
@@ -30,33 +30,30 @@
         public static function obtenerTodos()
         {
             $objAccesoDatos = AccesoDatos::obtenerInstancia();
-            $consulta = $objAccesoDatos->prepararConsulta("SELECT id,estado,tiempo,codigoPedido,precioFinal,foto,nombreCliente FROM pedido");
+            $consulta = $objAccesoDatos->prepararConsulta("SELECT id,idMesa,codigoPedido,estado,precioFinal,foto,nombreCliente FROM pedido");
             $consulta->execute();
 
-            return $consulta->fetchAll(PDO::FETCH_CLASS, 'pedido');
+            return $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
         }
 
         public static function obtenerPedido($pedido)
         {
             $objAccesoDatos = AccesoDatos::obtenerInstancia();
-            $consulta = $objAccesoDatos->prepararConsulta("SELECT id,estado,tiempo,codigoPedido,precioFinal,foto,nombreCliente FROM pedido WHERE codigoPedido = :codigoPedido");
+            $consulta = $objAccesoDatos->prepararConsulta("SELECT id,idMesa,codigoPedido,estado,precioFinal,foto,nombreCliente FROM pedido WHERE codigoPedido = :codigoPedido");
             $consulta->bindValue(':codigoPedido', $pedido, PDO::PARAM_INT);
             $consulta->execute();
 
             return $consulta->fetchObject('Pedido');
         }
 
-        public static function modificarPedido($codigoPedido, $estado, $tiempo, $precioFinal, $foto, $nombreCliente)
+        public function modificarPedido()
         {
             $objAccesoDato = AccesoDatos::obtenerInstancia();
-            $consulta = $objAccesoDato->prepararConsulta("UPDATE mesa SET codigoPedido = :codigoPedido, estado = :estado, tiempo = :tiempo, precioFinal = :precioFinal, foto = :foto, nombreCliente = :nombreCliente  WHERE id = :id");
-            $consulta->bindValue(':estado', $estado, PDO::PARAM_STR);
-            $consulta->bindValue(':tiempo', $tiempo, PDO::PARAM_STR);
-            $consulta->bindValue(':codigoPedido', $codigoPedido, PDO::PARAM_INT);
-            $consulta->bindValue(':precioFinal', $precioFinal, PDO::PARAM_INT);
-            $consulta->bindValue(':foto', $foto, PDO::PARAM_STR); //chequear
-            $consulta->bindValue(':nombreCliente', $nombreCliente, PDO::PARAM_STR);
-            //$consulta->bindValue(':id', $this->id, PDO::PARAM_INT);
+            $consulta = $objAccesoDato->prepararConsulta("UPDATE mesa SET estado = :estado, precioFinal = :precioFinal, foto = :foto, nombreCliente = :nombreCliente  WHERE id = :id");
+            $consulta->bindValue(':estado', $this->estado, PDO::PARAM_STR);
+            $consulta->bindValue(':precioFinal', $this->precioFinal, PDO::PARAM_INT);
+            $consulta->bindValue(':foto', $this->foto, PDO::PARAM_STR); //chequear
+            $consulta->bindValue(':nombreCliente', $this->nombreCliente, PDO::PARAM_STR);
             $consulta->execute();
         }
 

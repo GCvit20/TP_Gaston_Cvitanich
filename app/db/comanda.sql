@@ -35,7 +35,8 @@ CREATE TABLE IF NOT EXISTS `usuario` (
 
 
 CREATE TABLE IF NOT EXISTS `productos` (
-  `tipoProducto` varchar(200) COLLATE latin1_general_ci DEFAULT NULL,
+  `nombre` varchar(200) COLLATE latin1_general_ci DEFAULT NULL,
+  `sector` varchar(200) COLLATE latin1_general_ci DEFAULT NULL,
   `precio` DECIMAL(10,2) NOT NULL,
   `tiempo` SMALLINT NOT NULL,
   `id` bigint(20) unsigned NOT NULL
@@ -50,9 +51,9 @@ CREATE TABLE IF NOT EXISTS `mesa` (
 
 
 CREATE TABLE IF NOT EXISTS `pedido` (
+  `idMesa` varchar(5) COLLATE latin1_general_ci DEFAULT NULL,
   `codigoPedido` varchar(5) COLLATE latin1_general_ci DEFAULT NULL,
   `estado` varchar(200) COLLATE latin1_general_ci DEFAULT NULL,
-  `tiempo` SMALLINT NOT NULL,
   `precioFinal` DECIMAL(10,2) NOT NULL,
   `foto` BLOB,
   `nombreCliente` varchar(200) COLLATE latin1_general_ci DEFAULT NULL,
@@ -69,11 +70,25 @@ INSERT INTO `usuario` (`nombreEmpleado`, `ocupacion`, `id`) VALUES
 ('Gaston', 'Bartender', 6),
 ('Sandra', 'Cocinero', 7);
 
-INSERT INTO `productos` (`tipoProducto`, `precio`, `tiempo`, `id`) VALUES
-('Hamburguesas', 10000, 15, 1),
-('Vino', 8500, 120, 3), -- Cambiado a 120 minutos (2 horas)
-('Cerveza Brahama', 5000, 120, 6), -- Cambiado a 120 minutos (2 horas)
-('Vodka', 7500, 120, 7); -- Cambiado a 120 minutos (2 horas)
+INSERT INTO `productos` (`nombre`, `sector`,`precio`, `tiempo`, `id`) VALUES
+('Hamburguesas',"Cocinero",10000, 15, 1),
+('Vino', "Bartender",8500, 120, 3), -- Cambiado a 120 minutos (2 horas)
+('Cerveza Brahama',"Cerveceria", 5000, 120, 6), -- Cambiado a 120 minutos (2 horas)
+('Flan',"Candy Bar", 7500, 120, 7); -- Cambiado a 120 minutos (2 horas)
+
+
+INSERT INTO `mesa` (`codigoMesa`, `estado`,`id`) VALUES
+('12345',"con cliente comiendo", 1),
+('54789', "con cliente esperando pedido", 3), -- Cambiado a 120 minutos (2 horas)
+('56123',"con cliente pagando", 6), -- Cambiado a 120 minutos (2 horas)
+('98745',"cerrada", 7);
+
+INSERT INTO `pedido` (`idMesa`,`codigoPedido`,`estado`,`precioFinal`, `foto`,`nombreCliente`,`id`) VALUES
+('12345','54789','terminado',10000,'/img', 'Gaston', 1),
+('54789', '12345','en preparacion',8500,'/img','Jose', 3),
+('56123','95126','terminado',5000,'/img','Sandra', 6),
+('98745','26194','terminado',7500,'/img','Maria',7);
+
 
 
 --

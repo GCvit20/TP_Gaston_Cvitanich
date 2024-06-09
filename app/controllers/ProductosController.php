@@ -1,41 +1,75 @@
 <?php
 
     require_once 'models/productos.php';
+    require_once './interfaces/IApiUsable.php';
 
-    class ProductosController 
+    class ProductosController extends Producto implements IApiUsable
     {
 
-        public function insertarProducto($tipoProductos, $precio, $tiempo) 
+        public function insertar($request, $response, $args) 
         {
-            $producto = new Producto(); //instancia el producto
+            $parametros = $request->getParsedBody();
 
-            //asigna los campos
-            $producto->tipoProductos = $tipoProductos; 
+            $nombre = $parametros['nombre'];
+            $sector = $parametros['sector'];
+            $precio = $parametros['precio'];
+            $tiempo = $parametros['tiempo'];
+
+            $producto = new Producto();
+            $producto->nombre = $nombre; 
+            $producto->sector = $sector; 
             $producto->precio = $precio;
             $producto->tiempo = $tiempo;
+            $producto->crearProducto();
 
-            return $producto->crearProducto();
+            $payload = json_encode(array("mensaje" => "Producto creado con exito"));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
         }
 
-        public function modificarProducto($tipoProductos, $precio, $tiempo) 
+        public function modificar($request, $response, $args) 
         {
+            $parametros = $request->getParsedBody();
+
+            $nombre = $parametros['nombre'];
+            $sector = $parametros['sector'];
+            $precio = $parametros['precio'];
+            $tiempo = $parametros['tiempo'];
+
             $producto = new Producto();
-            $producto->tipoProductos = $tipoProductos; 
+            $producto->nombre = $nombre; 
+            $producto->sector = $sector; 
             $producto->precio = $precio;
             $producto->tiempo = $tiempo;
-            //return $producto->modificarProducto();
+            $producto->modificarProducto();
+
+            $payload = json_encode(array("mensaje" => "Producto modificado con exito"));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
         }
 
-        public function borrarProducto($id) 
+        public function borrar($request, $response, $args) 
         {
-            $producto = new Producto();
-            $producto->id = $id;
-            return $producto->borrarProducto($id);
+            $parametros = $request->getParsedBody();
+
+            $pedidoId = $parametros['id'];
+            Producto::borrarProducto($pedidoId);
+
+            $payload = json_encode(array("mensaje" => "Pedido borrado con exito"));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
         }
 
-        public function listarProductos() 
+        public function listarTodos($request, $response, $args) 
         {
-            return Producto::obtenerTodos();
+            $lista = Producto::obtenerTodos();
+            $payload = json_encode(array("listaProductos" => $lista));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
         }
 
     }

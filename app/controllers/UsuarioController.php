@@ -1,42 +1,71 @@
 <?php
 
     require_once 'models/usuario.php';
+    require_once 'interfaces/IApiUsable.php';
     //Recibe los datos, instancia el modelo y se encarga de llamar a los metodos del modelo.
 
-    class UsuarioController 
+    class UsuarioController extends Usuario implements IApiUsable
     {
 
-        public function insertarUsuario($nombreEmpleado, $ocupacion) 
+        public function insertar($request, $response, $args) 
         {
-            $usuario = new Usuario(); //instancia el usuario
 
-            //asigna los campos
-            $usuario->nombreEmpleado = $nombreEmpleado; 
-            $usuario->ocupacion = $ocupacion;
+            $parametros = $request->getParsedBody();
 
-            return $usuario->crearUsuario();
-        }
-
-        public function modificarUsuario($nombreEmpleado, $ocupacion) 
-        {
+            $nombreEmpleado = $parametros['nombreEmpleado'];
+            $ocupacion = $parametros['ocupacion'];
+            
             $usuario = new Usuario();
             $usuario->nombreEmpleado = $nombreEmpleado; 
             $usuario->ocupacion = $ocupacion;
-            return $usuario->modificarUsuario();
+            $usuario->crearUsuario();
+
+            $payload = json_encode(array("mensaje" => "Pedido creado con exito"));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
         }
 
-        public function borrarCd($id) 
+        public function modificar($request, $response, $args) 
         {
+            $parametros = $request->getParsedBody();
+
+            $nombreEmpleado = $parametros['nombreEmpleado'];
+            $ocupacion = $parametros['ocupacion'];
+
             $usuario = new Usuario();
-            $usuario->id = $id;
-            return $usuario->borrarUsuario($id);
+            $usuario->nombreEmpleado = $nombreEmpleado; 
+            $usuario->ocupacion = $ocupacion;
+            $usuario->modificarUsuario();
+
+            $payload = json_encode(array("mensaje" => "Pedido creado con exito"));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
         }
 
-        public function listarUsuarios() 
+        public function borrar($request, $response, $args) 
         {
-            return Usuario::obtenerTodos();
+            $parametros = $request->getParsedBody();
+
+            $pedidoId = $parametros['id'];
+            Usuario::borrarUsuario($pedidoId);
+
+            $payload = json_encode(array("mensaje" => "Pedido borrado con exito"));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
         }
 
+        public function listarTodos($request, $response, $args)
+        {
+            $lista = Usuario::obtenerTodos();
+            $payload = json_encode(array("listaUsuario" => $lista));
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+        
         public function buscarUsuarioPorId($id) 
         {
             $retorno = Usuario::obtenerUsuario($id);
