@@ -26,7 +26,7 @@
         public static function obtenerTodos()
         {
             $objAccesoDatos = AccesoDatos::obtenerInstancia();
-            $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombre, sector, precio, tiempo FROM productos");
+            $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombre, sector, precio, tiempo FROM productos WHERE fechaBaja IS NULL");
             $consulta->execute();
 
             return $consulta->fetchAll(PDO::FETCH_CLASS, 'Producto');
@@ -50,6 +50,8 @@
             $consulta->bindValue(':sector', $this->sector, PDO::PARAM_STR);
             $consulta->bindValue(':precio', $this->precio, PDO::PARAM_INT);
             $consulta->bindValue(':tiempo', $this->tiempo, PDO::PARAM_STR);
+            $consulta->bindValue(':id', $this->id, PDO::PARAM_INT);
+
             $consulta->execute();
         }
 
@@ -59,7 +61,7 @@
             $consulta = $objAccesoDato->prepararConsulta("UPDATE productos SET fechaBaja = :fechaBaja WHERE id = :id");
             $fecha = new DateTime(date("d-m-Y"));
             $consulta->bindValue(':id', $producto, PDO::PARAM_INT);
-            $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d H:i:s'));
+            $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d'));
             $consulta->execute();
         }
     }

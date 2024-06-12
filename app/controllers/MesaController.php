@@ -10,15 +10,23 @@
         {
             $parametros = $request->getParsedBody();
 
-            $codigoMesa = $parametros['codigoMesa'];
-            $estado = $parametros['estado'];
+            if(isset($parametros['codigoMesa']) && isset($parametros['estado'])) 
+            {
+                $codigoMesa = $parametros['codigoMesa'];
+                $estado = $parametros['estado'];
 
-            $mesa = new Mesa();
-            $mesa->codigoMesa = $codigoMesa; 
-            $mesa->estado = $estado;
-            $mesa->crearMesa();
+                $mesa = new Mesa();
+                $mesa->codigoMesa = $codigoMesa; 
+                $mesa->estado = $estado;
+                $mesa->crearMesa();
 
-            $payload = json_encode(array("mensaje" => "Mesa creada con exito"));
+                $payload = json_encode(array("Mensaje" => "Mesa creada con exito"));
+            } 
+            else 
+            {
+                $payload = json_encode(array("Mensaje" => "Faltan parámetros obligatorios"));
+                $response = $response->withStatus(400); 
+            }
 
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
@@ -28,15 +36,23 @@
         {
             $parametros = $request->getParsedBody();
 
-            $codigoMesa = $parametros['codigoMesa'];
-            $estado = $parametros['estado'];
+            if(isset($parametros['codigoMesa']) && isset($parametros['estado'])) 
+            {
+                $codigoMesa = $parametros['codigoMesa'];
+                $estado = $parametros['estado'];
 
-            $mesa = new Mesa();
-            $mesa->codigoMesa = $codigoMesa; 
-            $mesa->estado = $estado;
-            $mesa->modificarMesa();
+                $mesa = new Mesa();
+                $mesa->codigoMesa = $codigoMesa;
+                $mesa->estado = $estado;
+                $mesa->modificarMesa();
 
-            $payload = json_encode(array("mensaje" => "Mesa creada con exito"));
+                $payload = json_encode(array("Mensaje" => "Mesa modificada con exito"));
+            } 
+            else 
+            {
+                $payload = json_encode(array("Mensaje" => "Faltan parámetros obligatorios"));
+                $response = $response->withStatus(400); 
+            }
 
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
@@ -46,11 +62,19 @@
         {
             $parametros = $request->getParsedBody();
 
-            $pedidoId = $parametros['id'];
-            Mesa::borrarMesa($pedidoId);
+            if(isset($parametros['codigoMesa'])) 
+            {
+                $codigoMesa = $parametros['codigoMesa'];
+                Mesa::borrarMesa($codigoMesa);
 
-            $payload = json_encode(array("mensaje" => "Mesa borrado con exito"));
-
+                $payload = json_encode(array("mensaje" => "Mesa borrada con exito"));
+            } 
+            else 
+            {
+                $payload = json_encode(array("Mensaje" => "Faltan parámetros obligatorios"));
+                $response = $response->withStatus(400); 
+            }
+            
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
         }

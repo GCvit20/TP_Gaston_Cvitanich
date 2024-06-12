@@ -9,36 +9,57 @@
 
         public function insertar($request, $response, $args) 
         {
-
             $parametros = $request->getParsedBody();
 
-            $nombreEmpleado = $parametros['nombreEmpleado'];
-            $ocupacion = $parametros['ocupacion'];
-            
-            $usuario = new Usuario();
-            $usuario->nombreEmpleado = $nombreEmpleado; 
-            $usuario->ocupacion = $ocupacion;
-            $usuario->crearUsuario();
+            // Verificar si los parámetros esperados están presentes
+            if(isset($parametros['nombreEmpleado']) && isset($parametros['ocupacion'])) 
+            {
+                $nombreEmpleado = $parametros['nombreEmpleado'];
+                $ocupacion = $parametros['ocupacion'];
 
-            $payload = json_encode(array("mensaje" => "Pedido creado con exito"));
+                $usuario = new Usuario();
+                $usuario->nombreEmpleado = $nombreEmpleado; 
+                $usuario->ocupacion = $ocupacion;
+                $usuario->crearUsuario();
+
+                $payload = json_encode(array("Mensaje" => "Usuario creado con exito"));
+            } 
+            else 
+            {
+                // Si falta alguno de los parámetros, generar un mensaje de error
+                $payload = json_encode(array("Mensaje" => "Faltan parámetros obligatorios"));
+                $response = $response->withStatus(400); // Código de estado 400 para "Bad Request"
+            }
 
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
         }
 
+
         public function modificar($request, $response, $args) 
         {
             $parametros = $request->getParsedBody();
 
-            $nombreEmpleado = $parametros['nombreEmpleado'];
-            $ocupacion = $parametros['ocupacion'];
+            if(isset($parametros['id']) && isset($parametros['nombreEmpleado']) && isset($parametros['ocupacion'])) 
+            {
+                $id = $parametros['id'];
+                $nombreEmpleado = $parametros['nombreEmpleado'];
+                $ocupacion = $parametros['ocupacion'];
 
-            $usuario = new Usuario();
-            $usuario->nombreEmpleado = $nombreEmpleado; 
-            $usuario->ocupacion = $ocupacion;
-            $usuario->modificarUsuario();
+                $usuario = new Usuario();
+                $usuario->id = $id;
+                $usuario->nombreEmpleado = $nombreEmpleado; 
+                $usuario->ocupacion = $ocupacion;
+                $usuario->modificarUsuario();
 
-            $payload = json_encode(array("mensaje" => "Pedido creado con exito"));
+                $payload = json_encode(array("Mensaje" => "Usuario modificado con exito"));
+            } 
+            else 
+            {
+                
+                $payload = json_encode(array("Mensaje" => "Faltan parámetros obligatorios"));
+                $response = $response->withStatus(400); 
+            }
 
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
@@ -48,10 +69,19 @@
         {
             $parametros = $request->getParsedBody();
 
-            $pedidoId = $parametros['id'];
-            Usuario::borrarUsuario($pedidoId);
+            if(isset($parametros['id'])) 
+            {
+                $usuarioId = $parametros['id'];
+                Usuario::borrarUsuario($usuarioId);
 
-            $payload = json_encode(array("mensaje" => "Pedido borrado con exito"));
+                $payload = json_encode(array("Mensaje" => "Usuario borrado con exito"));
+            }
+            else 
+            {
+                
+                $payload = json_encode(array("Mensaje" => "Faltan parámetros obligatorios"));
+                $response = $response->withStatus(400); 
+            }
 
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
@@ -70,7 +100,7 @@
         {
             $retorno = Usuario::obtenerUsuario($id);
             if($retorno === false) { // Validamos que exista y si no mostramos un error
-                $retorno =  ['error' => 'No existe ese id'];
+                $retorno =  ['Error' => 'No existe ese id'];
             }
             return $retorno;
         }

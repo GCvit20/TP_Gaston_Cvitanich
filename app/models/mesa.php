@@ -22,7 +22,7 @@
         public static function obtenerTodos()
         {
             $objAccesoDatos = AccesoDatos::obtenerInstancia();
-            $consulta = $objAccesoDatos->prepararConsulta("SELECT id, codigoMesa, estado FROM mesa");
+            $consulta = $objAccesoDatos->prepararConsulta("SELECT id, codigoMesa, estado FROM mesa WHERE fechaBaja IS NULL");
             $consulta->execute();
 
             return $consulta->fetchAll(PDO::FETCH_CLASS, 'mesa');
@@ -41,20 +41,20 @@
         public function modificarMesa()
         {
             $objAccesoDato = AccesoDatos::obtenerInstancia();
-            $consulta = $objAccesoDato->prepararConsulta("UPDATE mesa SET codigoMesa = :codigoMesa, estado = :estado WHERE id = :id");
-            $consulta->bindValue(':codigoMesa', $this->codigoMesa, PDO::PARAM_INT);
+            $consulta = $objAccesoDato->prepararConsulta("UPDATE mesa SET estado = :estado WHERE codigoMesa = :codigoMesa");
+            $consulta->bindValue(':codigoMesa', $this->codigoMesa, PDO::PARAM_STR);
             $consulta->bindValue(':estado', $this->estado, PDO::PARAM_STR);
-            $consulta->bindValue(':id', $this->id, PDO::PARAM_INT);
+            //$consulta->bindValue(':id', $this->id, PDO::PARAM_INT);
             $consulta->execute();
         }
 
         public static function borrarMesa($mesa)
         {
             $objAccesoDato = AccesoDatos::obtenerInstancia();
-            $consulta = $objAccesoDato->prepararConsulta("UPDATE mesa SET fechaBaja = :fechaBaja WHERE id = :id");
+            $consulta = $objAccesoDato->prepararConsulta("UPDATE mesa SET fechaBaja = :fechaBaja WHERE codigoMesa = :codigoMesa");
             $fecha = new DateTime(date("d-m-Y"));
-            $consulta->bindValue(':id', $mesa, PDO::PARAM_INT);
-            $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d H:i:s'));
+            $consulta->bindValue(':codigoMesa', $mesa, PDO::PARAM_INT);
+            $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d'));
             $consulta->execute();
         }
     }

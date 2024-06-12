@@ -10,19 +10,28 @@
         {
             $parametros = $request->getParsedBody();
 
-            $nombre = $parametros['nombre'];
-            $sector = $parametros['sector'];
-            $precio = $parametros['precio'];
-            $tiempo = $parametros['tiempo'];
+            if(isset($parametros['nombre']) && isset($parametros['sector']) && isset($parametros['precio']) && isset($parametros['tiempo']))
+            {
+                $nombre = $parametros['nombre'];
+                $sector = $parametros['sector'];
+                $precio = $parametros['precio'];
+                $tiempo = $parametros['tiempo'];
 
-            $producto = new Producto();
-            $producto->nombre = $nombre; 
-            $producto->sector = $sector; 
-            $producto->precio = $precio;
-            $producto->tiempo = $tiempo;
-            $producto->crearProducto();
+                $producto = new Producto();
+                $producto->nombre = $nombre; 
+                $producto->sector = $sector; 
+                $producto->precio = $precio;
+                $producto->tiempo = $tiempo;
+                $producto->crearProducto();
 
-            $payload = json_encode(array("mensaje" => "Producto creado con exito"));
+                $payload = json_encode(array("mensaje" => "Producto creado con exito"));
+            }
+            else
+            {
+                // Si falta alguno de los parámetros, generar un mensaje de error
+                $payload = json_encode(array("mensaje" => "Faltan parámetros obligatorios"));
+                $response = $response->withStatus(400); // Código de estado 400 para "Bad Request"
+            }
 
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
@@ -32,19 +41,29 @@
         {
             $parametros = $request->getParsedBody();
 
-            $nombre = $parametros['nombre'];
-            $sector = $parametros['sector'];
-            $precio = $parametros['precio'];
-            $tiempo = $parametros['tiempo'];
+            if(isset($parametros['id']) && isset($parametros['nombre']) && isset($parametros['sector']) && isset($parametros['precio']) && isset($parametros['tiempo']))
+            {
+                $id = $parametros['id'];
+                $nombre = $parametros['nombre'];
+                $sector = $parametros['sector'];
+                $precio = $parametros['precio'];
+                $tiempo = $parametros['tiempo'];
 
-            $producto = new Producto();
-            $producto->nombre = $nombre; 
-            $producto->sector = $sector; 
-            $producto->precio = $precio;
-            $producto->tiempo = $tiempo;
-            $producto->modificarProducto();
+                $producto = new Producto();
+                $producto->id = $id;
+                $producto->nombre = $nombre; 
+                $producto->sector = $sector; 
+                $producto->precio = $precio;
+                $producto->tiempo = $tiempo;
+                $producto->modificarProducto();
 
-            $payload = json_encode(array("mensaje" => "Producto modificado con exito"));
+                $payload = json_encode(array("Mensaje" => "Producto modificado con exito"));
+            }
+            else
+            {
+                $payload = json_encode(array("Mensaje" => "Faltan parámetros obligatorios"));
+                $response = $response->withStatus(400); 
+            }
 
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
@@ -54,10 +73,21 @@
         {
             $parametros = $request->getParsedBody();
 
-            $pedidoId = $parametros['id'];
-            Producto::borrarProducto($pedidoId);
+            if(isset($parametros['id']))
+            {
+                $productoId = $parametros['id'];
+                Producto::borrarProducto($productoId);
+            }
+            else
+            {
+                $payload = json_encode(array("Mensaje" => "Faltan parámetros obligatorios"));
+                $response = $response->withStatus(400);
+            }
 
-            $payload = json_encode(array("mensaje" => "Pedido borrado con exito"));
+            $productoId = $parametros['id'];
+            Producto::borrarProducto($productoId);
+
+            $payload = json_encode(array("Mensaje" => "Producto borrado con exito"));
 
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');

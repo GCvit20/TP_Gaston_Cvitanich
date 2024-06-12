@@ -25,7 +25,7 @@ class Usuario
     public static function obtenerTodos()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombreEmpleado, ocupacion FROM usuario");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombreEmpleado, ocupacion FROM usuario WHERE fechaBaja IS NULL");
         $consulta->execute();
 
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'Usuario');
@@ -43,10 +43,9 @@ class Usuario
 
     public function modificarUsuario()
     {
-        
         $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuario SET usuario = :usuario, clave = :clave WHERE id = :id");
-        $consulta->bindValue(':usuario', $this->nombreEmpleado, PDO::PARAM_STR);
+        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuario SET nombreEmpleado = :nombreEmpleado, ocupacion = :ocupacion WHERE id = :id");
+        $consulta->bindValue(':nombreEmpleado', $this->nombreEmpleado, PDO::PARAM_STR);
         $consulta->bindValue(':ocupacion', $this->ocupacion, PDO::PARAM_STR);
         $consulta->bindValue(':id', $this->id, PDO::PARAM_INT);
         $consulta->execute();
@@ -55,10 +54,10 @@ class Usuario
     public static function borrarUsuario($usuario)
     {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuarios SET fechaBaja = :fechaBaja WHERE id = :id");
+        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuario SET fechaBaja = :fechaBaja WHERE id = :id");
         $fecha = new DateTime(date("d-m-Y"));
         $consulta->bindValue(':id', $usuario, PDO::PARAM_INT);
-        $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d H:i:s'));
+        $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d'));
         $consulta->execute();
     }
 }

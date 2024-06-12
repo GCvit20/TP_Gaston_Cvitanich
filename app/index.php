@@ -22,9 +22,6 @@
 
     $app = AppFactory::create();
 
-    // Set base path
-    $app->setBasePath('/app');
-
     // Add error middleware
     $app->addErrorMiddleware(true, true, true);
 
@@ -34,6 +31,8 @@
     $app->group('/usuario', function(RouteCollectorProxy $group)
     {
         $group->post('[/]', \UsuarioController::class . ':insertar');
+        $group->put('[/]', \UsuarioController::class . ':modificar');
+        $group->delete('[/]', \UsuarioController::class . ':borrar');
         $group->get('[/]', \UsuarioController::class . ':listarTodos');
     });
 
@@ -41,23 +40,30 @@
     $app->group('/producto', function(RouteCollectorProxy $group)
     {
         $group->post('[/]', \ProductosController::class . ':insertar');
+        $group->put('[/]', \ProductosController::class . ':modificar');
+        $group->delete('[/]', \ProductosController::class . ':borrar');
         $group->get('[/]', \ProductosController::class . ':listarTodos');
     });
 
     $app->group('/mesa', function(RouteCollectorProxy $group)
     {
         $group->post('[/]', \MesaController::class . ':insertar');
+        $group->put('[/]', \MesaController::class . ':modificar');
+        $group->delete('[/]', \MesaController::class . ':borrar');
         $group->get('[/]', \MesaController::class . ':listarTodos');
     });
 
     $app->group('/pedido', function(RouteCollectorProxy $group)
     {
         $group->post('[/]', \PedidoController::class . ':insertar');
+        $group->put('[/]', \PedidoController::class . ':modificar');
+        $group->delete('[/]', \PedidoController::class . ':borrar');
         $group->get('[/]', \PedidoController::class . ':listarTodos');
     });
 
-    $app->get('[/]', function (Request $request, Response $response) {    
-        $payload = json_encode(array("mensaje" => "Slim Framework 4 PHP"));
+    $app->get('[/]', function (Request $request, Response $response) 
+    {    
+        $payload = json_encode(array("mensaje" => "La comanda"));
         
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
