@@ -6,7 +6,6 @@
 
     use Psr\Http\Message\ResponseInterface as Response;
     use Psr\Http\Message\ServerRequestInterface as Request;
-    use Psr\Http\Server\RequestHandlerInterface;
     use Slim\Factory\AppFactory;
     use Slim\Routing\RouteCollectorProxy;
     use Slim\Routing\RouteContext;
@@ -16,6 +15,8 @@
     require_once 'controllers/PedidoController.php';
     require_once 'controllers/ProductosController.php';
     require_once 'controllers/MesaController.php';
+    require_once 'middlewares/AuthMiddleware.php';
+
 
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
@@ -34,7 +35,7 @@
         $group->put('[/]', \UsuarioController::class . ':modificar');
         $group->delete('[/]', \UsuarioController::class . ':borrar');
         $group->get('[/]', \UsuarioController::class . ':listarTodos');
-    });
+    })->add(new AuthMiddleware("socio"));
 
     
     $app->group('/producto', function(RouteCollectorProxy $group)
@@ -43,7 +44,7 @@
         $group->put('[/]', \ProductosController::class . ':modificar');
         $group->delete('[/]', \ProductosController::class . ':borrar');
         $group->get('[/]', \ProductosController::class . ':listarTodos');
-    });
+    })->add(new AuthMiddleware("socio"));
 
     $app->group('/mesa', function(RouteCollectorProxy $group)
     {
@@ -51,7 +52,8 @@
         $group->put('[/]', \MesaController::class . ':modificar');
         $group->delete('[/]', \MesaController::class . ':borrar');
         $group->get('[/]', \MesaController::class . ':listarTodos');
-    });
+    })->add(new AuthMiddleware("socio"))
+      ->add(new AuthMiddleware("mozo"));
 
     $app->group('/pedido', function(RouteCollectorProxy $group)
     {
@@ -59,7 +61,8 @@
         $group->put('[/]', \PedidoController::class . ':modificar');
         $group->delete('[/]', \PedidoController::class . ':borrar');
         $group->get('[/]', \PedidoController::class . ':listarTodos');
-    });
+    })->add(new AuthMiddleware("socio"))
+      ->add(new AuthMiddleware("mozo"));
 
     $app->get('[/]', function (Request $request, Response $response) 
     {    
@@ -68,6 +71,10 @@
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     });
+
+    //Area empleados
+
+
 
     $app->run();
    
