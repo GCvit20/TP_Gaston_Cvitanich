@@ -1,11 +1,44 @@
 <?php
 
+require_once 'models/usuario.php';
+require_once 'db/AccesoDatos.php';
+
 use Firebase\JWT\JWT;
 
     class AutentificadorJWT
-    {
-        private static $claveSecreta = 'T3sT$JWT'; //mover a un sitio seguro (ej:db)
-        private static $tipoEncriptacion = ['HS256'];
+    {        
+        private static function obtenerClaveSecreta()
+        {
+            $objDataAccess = AccesoDatos::obtenerInstancia();
+            $query = $objDataAccess->prepararConsulta("SELECT claveSecreta FROM config WHERE id = 1");
+            $query->execute();
+            $claveSecreta = $query->fetchColumn();
+
+            if ($claveSecreta === false) 
+            {
+                throw new Exception("No se pudo obtener la clave secreta de la base de datos.");
+            }
+            
+            return $claveSecreta;
+        }
+
+        private static function obtenerEncriptacion()
+        {
+            $objDataAccess = AccesoDatos::obtenerInstancia(); 
+            $query = $objDataAccess->prepararConsulta("SELECT tipoEncriptacion FROM config WHERE id = 1");
+            $query->execute();
+            $tipoEncriptacion = $query->fetchColumn();
+
+            if ($tipoEncriptacion === false) 
+            {
+                throw new Exception("No se pudo obtener el tipo de encriptacion de la base de datos.");
+            }
+
+            //debemos convertirlo en array por que las bibliotecas JWT esperan un array de algoritmos de encriptación
+            $tipoEncriptacionArray = explode(',', $tipoEncriptacion);
+            
+            return $tipoEncriptacionArray;
+        }
 
         public static function CrearToken($datos)
         {
@@ -17,7 +50,9 @@ use Firebase\JWT\JWT;
                 'data' => $datos,
                 'app' => "Test JWT"
             );
-            return JWT::encode($payload, self::$claveSecreta);
+            
+            $claveSecreta = self::obtenerClaveSecreta();
+            return JWT::encode($payload, $claveSecreta);
         }
 
         public static function VerificarToken($token)
@@ -28,13 +63,15 @@ use Firebase\JWT\JWT;
             try {
                 $decodificado = JWT::decode(
                     $token,
-                    self::$claveSecreta,
-                    self::$tipoEncriptacion
+                    self::obtenerClaveSecreta(),
+                    self::obtenerEncriptacion()
                 );
-            } catch (Exception $e) {
+            } catch (Exception $e) 
+            {
                 throw $e;
             }
-            if ($decodificado->aud !== self::Aud()) {
+            if ($decodificado->aud !== self::Aud()) 
+            {
                 throw new Exception("No es el usuario valido");
             }
         }
@@ -47,8 +84,8 @@ use Firebase\JWT\JWT;
             }
             return JWT::decode(
                 $token,
-                self::$claveSecreta,
-                self::$tipoEncriptacion
+                self::obtenerClaveSecreta(),
+                self::obtenerEncriptacion()
             );
         }
 
@@ -56,8 +93,8 @@ use Firebase\JWT\JWT;
         {
             return JWT::decode(
                 $token,
-                self::$claveSecreta,
-                self::$tipoEncriptacion
+                self::obtenerClaveSecreta(),
+                self::obtenerEncriptacion()
             )->data;
         }
 

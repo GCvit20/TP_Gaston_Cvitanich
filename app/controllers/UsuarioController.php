@@ -12,13 +12,15 @@
             $parametros = $request->getParsedBody();
 
             // Verificar si los parámetros esperados están presentes
-            if(isset($parametros['nombreEmpleado']) && isset($parametros['ocupacion'])) 
+            if(isset($parametros['nombreUsuario']) && isset($parametros['clave']) && isset($parametros['ocupacion'])) 
             {
-                $nombreEmpleado = $parametros['nombreEmpleado'];
+                $nombreUsuario = $parametros['nombreUsuario'];
+                $clave = $parametros['clave'];
                 $ocupacion = $parametros['ocupacion'];
 
                 $usuario = new Usuario();
-                $usuario->nombreEmpleado = $nombreEmpleado; 
+                $usuario->nombreUsuario = $nombreUsuario; 
+                $usuario->clave = $clave;
                 $usuario->ocupacion = $ocupacion;
                 $usuario->crearUsuario();
 
@@ -40,15 +42,17 @@
         {
             $parametros = $request->getParsedBody();
 
-            if(isset($parametros['id']) && isset($parametros['nombreEmpleado']) && isset($parametros['ocupacion'])) 
+            if(isset($parametros['id']) && isset($parametros['nombreUsuario']) && isset($parametros['clave']) && isset($parametros['ocupacion'])) 
             {
                 $id = $parametros['id'];
-                $nombreEmpleado = $parametros['nombreEmpleado'];
+                $nombreUsuario = $parametros['nombreUsuario'];
+                $clave = $parametros['clave'];
                 $ocupacion = $parametros['ocupacion'];
 
                 $usuario = new Usuario();
                 $usuario->id = $id;
-                $usuario->nombreEmpleado = $nombreEmpleado; 
+                $usuario->nombreUsuario = $nombreUsuario; 
+                $usuario->clave = $clave;
                 $usuario->ocupacion = $ocupacion;
                 $usuario->modificarUsuario();
 
@@ -95,7 +99,7 @@
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
         }
-        
+
         public function buscarUsuarioPorId($id) 
         {
             $retorno = Usuario::obtenerUsuario($id);

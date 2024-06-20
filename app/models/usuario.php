@@ -5,18 +5,20 @@ require_once 'db/AccesoDatos.php';
 class Usuario
 {
     public $id;
-    public $nombreEmpleado;
-    //public $clave;
+    public $nombreUsuario;
+    public $clave;
     public $ocupacion;
+    public $fechaBaja;
 
     public function crearUsuario()
     {
         
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO usuario (nombreEmpleado, ocupacion) VALUES (:nombreEmpleado, :ocupacion)");
-        //$claveHash = password_hash($this->clave, PASSWORD_DEFAULT);
-        $consulta->bindValue(':nombreEmpleado', $this->nombreEmpleado, PDO::PARAM_STR);
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO usuario (nombreUsuario, clave, ocupacion) VALUES (:nombreUsuario, :clave, :ocupacion)");
+        $claveHash = password_hash($this->clave, PASSWORD_DEFAULT);
+        $consulta->bindValue(':nombreUsuario', $this->nombreUsuario, PDO::PARAM_STR);
         $consulta->bindValue(':ocupacion', $this->ocupacion, PDO::PARAM_STR);
+        $consulta->bindValue(':clave', $claveHash);
         $consulta->execute();
 
         return $objAccesoDatos->obtenerUltimoId();
@@ -25,7 +27,7 @@ class Usuario
     public static function obtenerTodos()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombreEmpleado, ocupacion FROM usuario WHERE fechaBaja IS NULL");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombreUsuario, ocupacion FROM usuario WHERE fechaBaja IS NULL");
         $consulta->execute();
 
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'Usuario');
@@ -34,8 +36,18 @@ class Usuario
     public static function obtenerUsuario($usuario)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombreEmpleado, ocupacion FROM usuario WHERE nombreEmpleado = :nombreEmpleado");
-        $consulta->bindValue(':nombreEmpleado', $usuario, PDO::PARAM_STR);
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombreUsuario, ocupacion FROM usuario WHERE nombreUsuario = :nombreUsuario");
+        $consulta->bindValue(':nombreUsuario', $usuario, PDO::PARAM_STR);
+        $consulta->execute();
+
+        return $consulta->fetchObject('Usuario');
+    }
+
+    public static function obtenerClave($usuario)
+    {
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombreUsuario, clave, ocupacion FROM usuario WHERE nombreUsuario = :nombreUsuario");
+        $consulta->bindValue(':clave', $usuario, PDO::PARAM_STR);
         $consulta->execute();
 
         return $consulta->fetchObject('Usuario');
@@ -44,8 +56,9 @@ class Usuario
     public function modificarUsuario()
     {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuario SET nombreEmpleado = :nombreEmpleado, ocupacion = :ocupacion WHERE id = :id");
-        $consulta->bindValue(':nombreEmpleado', $this->nombreEmpleado, PDO::PARAM_STR);
+        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuario SET nombreUsuario = :nombreUsuario, clave = :clave, ocupacion = :ocupacion WHERE id = :id");
+        $consulta->bindValue(':nombreUsuario', $this->nombreUsuario, PDO::PARAM_STR);
+        $consulta->bindValue(':clave', $this->clave, PDO::PARAM_STR);
         $consulta->bindValue(':ocupacion', $this->ocupacion, PDO::PARAM_STR);
         $consulta->bindValue(':id', $this->id, PDO::PARAM_INT);
         $consulta->execute();
@@ -59,5 +72,20 @@ class Usuario
         $consulta->bindValue(':id', $usuario, PDO::PARAM_INT);
         $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d'));
         $consulta->execute();
+    }
+
+    public static function ObtenerUsuarioPorNombreUsuario($nombreUsuario)
+    {
+        $objDataAccess = AccesoDatos::obtenerInstancia();
+        $query = $objDataAccess->prepararConsulta("SELECT * FROM usuario WHERE nombreUsuario = :nombreUsuario");
+        $query->bindValue(':nombreUsuario', $nombreUsuario, PDO::PARAM_STR);
+        $query->execute();
+        $usuario = $query->fetchObject('Usuario');
+
+        if (!$usuario) {
+            return null;
+        }
+        
+        return $usuario;
     }
 }

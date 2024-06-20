@@ -11,20 +11,31 @@
         {
             
             $parametros = $request->getParsedBody();
+            $files = $request->getUploadedFiles();
 
-            if(isset($parametros['idMesa']) && isset($parametros['codigoPedido']) && isset($parametros['estado']) && isset($parametros['precioFinal']) && isset($parametros['foto']) && isset($parametros['nombreCliente']))
+            if(isset($parametros['idMesa']) && isset($parametros['codigoPedido']) && isset($parametros['estado']) && isset($parametros['tiempoEstimado']) && isset($parametros['precioFinal']) && isset($files['foto']) && isset($parametros['nombreCliente']))
             {
                 $idMesa = $parametros['idMesa'];
                 $codigoPedido = $parametros['codigoPedido'];
                 $estado = $parametros['estado'];
+                $tiempoEstimado = $parametros['tiempoEstimado'];
                 $precioFinal = $parametros['precioFinal'];
-                $foto = $parametros['foto'];
                 $nombreCliente = $parametros['nombreCliente'];
-    
+
+                $foto = $files['foto'];
+                $uploadedFileName = $foto->getClientFilename();
+                
+                // Mover el archivo al directorio de destino (asegúrate de que el directorio tenga permisos de escritura)
+                $uploadPath = "C:\\xampp\\htdocs\\TP\\app\\{$uploadedFileName}";
+                echo $uploadPath;
+
+                $foto->moveTo($uploadPath);
+
                 $pedido = new Pedido(); //instancia el pedido
                 $pedido->idMesa = $idMesa; 
                 $pedido->codigoPedido = $codigoPedido; 
                 $pedido->estado = $estado;
+                $pedido->tiempoEstimado = $tiempoEstimado;
                 $pedido->precioFinal = $precioFinal;
                 $pedido->foto = $foto;
                 $pedido->nombreCliente = $nombreCliente;
@@ -49,19 +60,17 @@
 
             if(isset($parametros['codigoPedido']) && isset($parametros['estado']) && isset($parametros['precioFinal']) && isset($parametros['foto']) && isset($parametros['nombreCliente']))
             {
-                //$id = $parametros['id'];
-                //$idMesa = $parametros['idMesa'];
                 $codigoPedido = $parametros['codigoPedido'];
                 $estado = $parametros['estado'];
+                $tiempoEstimado = $parametros['tiempoEstimado'];
                 $precioFinal = $parametros['precioFinal'];
                 $foto = $parametros['foto'];
                 $nombreCliente = $parametros['nombreCliente'];
     
                 $pedido = new Pedido(); //instancia el pedido
-                //$pedido->id = $id;
-                //$pedido->idMesa = $idMesa; 
                 $pedido->codigoPedido = $codigoPedido; 
                 $pedido->estado = $estado;
+                $pedido->tiempoEstimado = $tiempoEstimado;
                 $pedido->precioFinal = $precioFinal;
                 $pedido->foto = $foto;
                 $pedido->nombreCliente = $nombreCliente;
